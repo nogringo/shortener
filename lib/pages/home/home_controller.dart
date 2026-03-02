@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ndk/ndk.dart';
 import 'package:nostr_shortener/nostr_shortener.dart';
 import 'package:shortener/routes/app_routes.dart';
+import 'package:toastification/toastification.dart';
 
 class HomeController extends GetxController {
   static HomeController get to => Get.find();
@@ -85,17 +88,39 @@ class HomeController extends GetxController {
         );
         linkFieldController.clear();
       } else {
-        Get.snackbar(
-          'Invalid link',
-          'Please paste a valid shortener link (format: key/authorPrefix)',
-          snackPosition: SnackPosition.BOTTOM,
+        toastification.show(
+          title: const Text('Invalid link'),
+          description: Text(
+            'Please paste a valid shortener link (format: key/authorPrefix)',
+          ),
+          type: ToastificationType.error,
+          style: ToastificationStyle.fillColored,
+          autoCloseDuration: const Duration(seconds: 3),
         );
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to parse link: $e',
-        snackPosition: SnackPosition.BOTTOM,
+      toastification.show(
+        title: const Text('Error'),
+        description: Text('Failed to parse link: $e'),
+        type: ToastificationType.error,
+        style: ToastificationStyle.fillColored,
+        autoCloseDuration: const Duration(seconds: 3),
+      );
+    }
+  }
+
+  void copyLink(String link, {required BuildContext context}) {
+    Clipboard.setData(ClipboardData(text: link));
+
+    // Don't show toast on Android - OS already shows feedback
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      toastification.show(
+        title: const Text('Copied'),
+        description: const Text('Link copied to clipboard'),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+        autoCloseDuration: const Duration(seconds: 2),
+        context: context,
       );
     }
   }

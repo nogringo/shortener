@@ -59,11 +59,31 @@ class CreateView extends StatelessWidget {
           const SizedBox(height: 8),
           GetBuilder<HomeController>(
             builder: (c) {
-              return Text(
-                "$baseUrl${c.key}/${c.authorPrefix}",
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(fontFamily: 'monospace'),
+              final link = "$baseUrl${c.key}/${c.authorPrefix}";
+              return Card(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                margin: .zero,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          link,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontFamily: 'monospace'),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: () =>
+                            HomeController.to.copyLink(link, context: context),
+                        icon: const Icon(Icons.copy),
+                        tooltip: "Copy link",
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           ),

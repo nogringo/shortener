@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shortener/config.dart';
 import 'package:shortener/routes/app_routes.dart';
+import 'package:toastification/toastification.dart';
 
 import 'resolve_controller.dart';
 
@@ -21,10 +24,31 @@ class ResolvePage extends StatelessWidget {
       ResolveController(routeKey: routeKey, authorPrefix: authorPrefix),
     );
 
+    final link = "$baseUrl$routeKey/$authorPrefix";
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Shortener"),
         actions: [
+          IconButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: link));
+
+              // Don't show toast on Android - OS already shows feedback
+              if (defaultTargetPlatform != TargetPlatform.android) {
+                toastification.show(
+                  title: const Text('Copied'),
+                  description: const Text('Link copied to clipboard'),
+                  type: ToastificationType.success,
+                  style: ToastificationStyle.fillColored,
+                  autoCloseDuration: const Duration(seconds: 2),
+                  context: context,
+                );
+              }
+            },
+            icon: const Icon(Icons.copy),
+            tooltip: "Copy link",
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: FilledButton(
@@ -64,9 +88,52 @@ class ResolvePage extends StatelessWidget {
                 const Icon(Icons.search_off, size: 48, color: Colors.grey),
                 const SizedBox(height: 16),
                 Text(
-                  "No items found for $baseUrl$routeKey/$authorPrefix",
+                  "No items found",
                   style: Theme.of(context).textTheme.bodyLarge,
                   textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Card(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            "$baseUrl$routeKey/$authorPrefix",
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(fontFamily: 'monospace'),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: link));
+
+                            // Don't show toast on Android - OS already shows feedback
+                            if (defaultTargetPlatform !=
+                                TargetPlatform.android) {
+                              toastification.show(
+                                title: const Text('Copied'),
+                                description: const Text(
+                                  'Link copied to clipboard',
+                                ),
+                                type: ToastificationType.success,
+                                style: ToastificationStyle.fillColored,
+                                autoCloseDuration: const Duration(seconds: 2),
+                                context: context,
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.copy),
+                          tooltip: "Copy link",
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -91,9 +158,38 @@ class ResolvePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      item.value,
-                      style: Theme.of(context).textTheme.titleMedium,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.value,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: link));
+
+                            // Don't show toast on Android - OS already shows feedback
+                            if (defaultTargetPlatform !=
+                                TargetPlatform.android) {
+                              toastification.show(
+                                title: const Text('Copied'),
+                                description: const Text(
+                                  'Link copied to clipboard',
+                                ),
+                                type: ToastificationType.success,
+                                style: ToastificationStyle.fillColored,
+                                autoCloseDuration: const Duration(seconds: 2),
+                                context: context,
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.copy),
+                          tooltip: "Copy link",
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     if (item.type != null)

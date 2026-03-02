@@ -6,6 +6,7 @@ import 'package:ndk/shared/nips/nip01/bip340.dart';
 import 'package:ndk_flutter/ndk_flutter.dart';
 import 'package:shortener/routes/app_routes.dart';
 import 'package:system_theme/system_theme.dart';
+import 'package:toastification/toastification.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,21 +45,23 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      theme: ThemeData.from(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: SystemTheme.accentColor.accent,
-          brightness: Brightness.light,
+    return ToastificationWrapper(
+      child: GetMaterialApp(
+        theme: ThemeData.from(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: SystemTheme.accentColor.accent,
+            brightness: Brightness.light,
+          ),
         ),
-      ),
-      darkTheme: ThemeData.from(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: SystemTheme.accentColor.accent,
-          brightness: Brightness.dark,
+        darkTheme: ThemeData.from(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: SystemTheme.accentColor.accent,
+            brightness: Brightness.dark,
+          ),
         ),
+        initialRoute: AppRoutes.home,
+        getPages: AppRoutes.pages,
       ),
-      initialRoute: AppRoutes.home,
-      getPages: AppRoutes.pages,
     );
   }
 }
