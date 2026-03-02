@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip01/bip340.dart';
 import 'package:ndk_flutter/ndk_flutter.dart';
-import 'package:shortener/pages/home/home_page.dart';
+import 'package:shortener/routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +41,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(home: HomePage());
+    return GetMaterialApp(
+      initialRoute: AppRoutes.home,
+      getPages: AppRoutes.pages,
+    );
   }
 }

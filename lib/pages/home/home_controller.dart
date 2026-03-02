@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ndk/ndk.dart';
 import 'package:nostr_shortener/nostr_shortener.dart';
+import 'package:shortener/routes/app_routes.dart';
 
 class HomeController extends GetxController {
   static HomeController get to => Get.find();
@@ -24,7 +25,10 @@ class HomeController extends GetxController {
   Future<void> create() async {
     isCreating.value = true;
 
-    final link = await Shortener.create(value: valueFieldController.text);
+    await Shortener.create(value: valueFieldController.text);
+
+    // Navigate to resolve page
+    Get.toNamed(AppRoutes.resolveRoute(key: key, authorPrefix: authorPrefix));
 
     isCreating.value = false;
   }

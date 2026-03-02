@@ -11,36 +11,34 @@ class HomePage extends StatelessWidget {
     Get.put(HomeController());
     return Scaffold(
       appBar: AppBar(
-        title: Text("Shortener"),
+        title: const Text("Shortener"),
         actions: [
           Obx(() {
             final isCreating = HomeController.to.isCreating.value;
 
-            Widget icon = Icon(Icons.create);
+            Widget icon = const Icon(Icons.create);
             if (isCreating) {
               icon = SizedBox(
                 height: 20,
                 width: 20,
                 child: Padding(
                   padding: const EdgeInsets.all(2),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                  ),
+                  child: CircularProgressIndicator(strokeWidth: 2),
                 ),
               );
             }
 
             return FilledButton.icon(
               onPressed: isCreating ? null : HomeController.to.create,
-              label: Text("Create"),
+              label: const Text("Create"),
               icon: icon,
             );
           }),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
         ],
       ),
       body: ListView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         children: [
           GetBuilder<HomeController>(
             builder: (c) {
