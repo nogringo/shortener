@@ -25,7 +25,11 @@ class HomeController extends GetxController {
   Future<void> create() async {
     isCreating.value = true;
 
-    await Shortener.create(value: valueFieldController.text);
+    await Shortener.create(
+      key: key,
+      value: valueFieldController.text,
+      ndk: Get.find<Ndk>(),
+    );
 
     // Navigate to resolve page
     Get.toNamed(AppRoutes.resolveRoute(key: key, authorPrefix: authorPrefix));

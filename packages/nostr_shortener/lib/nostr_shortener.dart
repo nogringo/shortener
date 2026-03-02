@@ -4,3 +4,4 @@
 library;
 
 export 'src/nostr_shortener_base.dart';
+export 'src/models/shortened.dart';
