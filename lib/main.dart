@@ -5,9 +5,12 @@ import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip01/bip340.dart';
 import 'package:ndk_flutter/ndk_flutter.dart';
 import 'package:shortener/routes/app_routes.dart';
+import 'package:system_theme/system_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemTheme.accentColor.load();
 
   final ndk = Ndk(
     NdkConfig(
@@ -42,6 +45,18 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      theme: ThemeData.from(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: SystemTheme.accentColor.accent,
+          brightness: Brightness.light,
+        ),
+      ),
+      darkTheme: ThemeData.from(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: SystemTheme.accentColor.accent,
+          brightness: Brightness.dark,
+        ),
+      ),
       initialRoute: AppRoutes.home,
       getPages: AppRoutes.pages,
     );
