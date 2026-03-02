@@ -1,4 +1,4 @@
-name: nostr_shortener
+name: shortener
 description: "A new Flutter project."
 publish_to: 'none'
 version: 0.1.0+1
@@ -9,6 +9,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  get: ^4.7.3
+  ndk: ^0.7.1-dev.19
+  ndk_flutter: ^0.0.2-dev.13
+  nostr_shortener:
+    path: packages/nostr_shortener
 
 dev_dependencies:
   flutter_test:

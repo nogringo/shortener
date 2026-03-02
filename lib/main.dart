@@ -1,6 +1,38 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:ndk/ndk.dart';
+import 'package:ndk/shared/nips/nip01/bip340.dart';
+import 'package:ndk_flutter/ndk_flutter.dart';
+import 'package:shortener/pages/home/home_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final ndk = Ndk(
+    NdkConfig(
+      eventVerifier: kIsWeb ? WebEventVerifier() : Bip340EventVerifier(),
+      cache: MemCacheManager(),
+    ),
+  );
+
+  final ndkFlutter = NdkFlutter(ndk: ndk);
+
+  await ndkFlutter.restoreAccountsState();
+
+  if (ndk.accounts.isNotLoggedIn) {
+    final keyPair = Bip340.generatePrivateKey();
+    ndk.accounts.loginPrivateKey(
+      pubkey: keyPair.publicKey,
+      privkey: keyPair.privateKey!,
+    );
+
+    await ndkFlutter.saveAccountsState();
+  }
+
+  Get.put(ndk);
+  Get.put(ndkFlutter);
+
   runApp(const MainApp());
 }
 
@@ -9,12 +41,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
+    return GetMaterialApp(home: HomePage());
   }
 }
