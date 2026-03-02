@@ -1,56 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shortener/config.dart';
 import 'package:shortener/pages/home/home_controller.dart';
+import 'package:shortener/pages/home/views/create_view.dart';
+import 'package:shortener/pages/home/views/resolve_view.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     Get.put(HomeController());
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Shortener"),
-        actions: [
-          Obx(() {
-            final isCreating = HomeController.to.isCreating.value;
-
-            Widget icon = const Icon(Icons.create);
-            if (isCreating) {
-              icon = SizedBox(
-                height: 20,
-                width: 20,
-                child: Padding(
-                  padding: const EdgeInsets.all(2),
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              );
-            }
-
-            return FilledButton.icon(
-              onPressed: isCreating ? null : HomeController.to.create,
-              label: const Text("Create"),
-              icon: icon,
-            );
-          }),
-          const SizedBox(width: 12),
-        ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.add_link), text: "Create"),
+            Tab(icon: Icon(Icons.open_in_new), text: "Resolve"),
+          ],
+        ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          GetBuilder<HomeController>(
-            builder: (c) {
-              return Text("Preview: $baseUrl${c.key}/${c.authorPrefix}");
-            },
-          ),
-          TextField(
-            controller: HomeController.to.keyFieldController,
-            onChanged: (_) => HomeController.to.update(),
-          ),
-          TextField(controller: HomeController.to.valueFieldController),
-        ],
+      body: TabBarView(
+        controller: _tabController,
+        children: const [CreateView(), ResolveView()],
       ),
     );
   }

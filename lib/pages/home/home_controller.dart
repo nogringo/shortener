@@ -9,10 +9,18 @@ class HomeController extends GetxController {
 
   TextEditingController keyFieldController = TextEditingController();
   TextEditingController valueFieldController = TextEditingController();
+  TextEditingController linkFieldController = TextEditingController();
 
   final randomKey = Shortener.generateKey();
 
   RxBool isCreating = false.obs;
+  RxBool isValueEmpty = true.obs;
+
+  HomeController() {
+    valueFieldController.addListener(() {
+      isValueEmpty.value = valueFieldController.text.trim().isEmpty;
+    });
+  }
 
   String get key {
     if (keyFieldController.text.isEmpty) return randomKey;
@@ -35,5 +43,60 @@ class HomeController extends GetxController {
     Get.toNamed(AppRoutes.resolveRoute(key: key, authorPrefix: authorPrefix));
 
     isCreating.value = false;
+  }
+
+  void resolveLink() {
+    final link = linkFieldController.text.trim();
+    if (link.isEmpty) return;
+
+    // Parse the link to extract key and authorPrefix
+    // Expected format: https://.../#/key/authorPrefix or key/authorPrefix
+    String? key;
+    String? authorPrefix;
+
+    try {
+      final uri = Uri.tryParse(link);
+      if (uri != null && uri.hasFragment) {
+        final fragment = uri.fragment;
+        if (fragment.startsWith('/')) {
+          final parts = fragment.substring(1).split('/');
+          if (parts.length >= 2) {
+            key = parts[0];
+            authorPrefix = parts[1];
+          }
+        }
+      } else if (link.startsWith('/')) {
+        final parts = link.substring(1).split('/');
+        if (parts.length >= 2) {
+          key = parts[0];
+          authorPrefix = parts[1];
+        }
+      } else {
+        final parts = link.split('/');
+        if (parts.length >= 2) {
+          key = parts[0];
+          authorPrefix = parts[1];
+        }
+      }
+
+      if (key != null && authorPrefix != null) {
+        Get.toNamed(
+          AppRoutes.resolveRoute(key: key, authorPrefix: authorPrefix),
+        );
+        linkFieldController.clear();
+      } else {
+        Get.snackbar(
+          'Invalid link',
+          'Please paste a valid shortener link (format: key/authorPrefix)',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to parse link: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 }
