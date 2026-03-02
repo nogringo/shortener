@@ -2,9 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:ndk_flutter/ndk_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shortener/config.dart';
-import 'package:shortener/routes/app_routes.dart';
 import 'package:toastification/toastification.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'resolve_controller.dart';
 
@@ -49,13 +51,14 @@ class ResolvePage extends StatelessWidget {
             icon: const Icon(Icons.copy),
             tooltip: "Copy link",
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: FilledButton(
-              onPressed: AppRoutes.toHome,
-              child: const Text("Create"),
-            ),
+          IconButton(
+            onPressed: () {
+              SharePlus.instance.share(ShareParams(text: link));
+            },
+            icon: const Icon(Icons.share),
+            tooltip: "Share link",
           ),
+          SizedBox(width: 12),
         ],
       ),
       body: Obx(() {
@@ -153,6 +156,13 @@ class ResolvePage extends StatelessWidget {
             final item = controller.items[index];
             return Card(
               margin: const EdgeInsets.only(bottom: 16),
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outline,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -162,14 +172,25 @@ class ResolvePage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(
-                            item.value,
-                            style: Theme.of(context).textTheme.titleMedium,
+                          child: GestureDetector(
+                            onTap: () async {
+                              final uri = Uri.tryParse(item.value);
+                              if (uri != null && await canLaunchUrl(uri)) {
+                                await launchUrl(
+                                  uri,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              }
+                            },
+                            child: SelectableText(
+                              item.value,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
                           ),
                         ),
                         IconButton(
                           onPressed: () {
-                            Clipboard.setData(ClipboardData(text: link));
+                            Clipboard.setData(ClipboardData(text: item.value));
 
                             // Don't show toast on Android - OS already shows feedback
                             if (defaultTargetPlatform !=
@@ -177,7 +198,7 @@ class ResolvePage extends StatelessWidget {
                               toastification.show(
                                 title: const Text('Copied'),
                                 description: const Text(
-                                  'Link copied to clipboard',
+                                  'Value copied to clipboard',
                                 ),
                                 type: ToastificationType.success,
                                 style: ToastificationStyle.fillColored,
@@ -187,7 +208,7 @@ class ResolvePage extends StatelessWidget {
                             }
                           },
                           icon: const Icon(Icons.copy),
-                          tooltip: "Copy link",
+                          tooltip: "Copy value",
                         ),
                       ],
                     ),
@@ -198,13 +219,21 @@ class ResolvePage extends StatelessWidget {
                         visualDensity: VisualDensity.compact,
                       ),
                     const SizedBox(height: 8),
-                    Text(
-                      "Author: ${item.author.substring(0, 8)}...",
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    Text(
-                      "Key: ${item.key}",
-                      style: Theme.of(context).textTheme.bodySmall,
+                    Row(
+                      children: [
+                        NPicture(
+                          ndkFlutter: Get.find(),
+                          pubkey: item.author,
+                          circleAvatarRadius: 12,
+                        ),
+                        SizedBox(width: 8),
+                        Obx(
+                          () => Text(
+                            controller.getDisplayName(item.author),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
