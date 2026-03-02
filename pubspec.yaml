@@ -1,5 +1,5 @@
 name: shortener
-description: "A new Flutter project."
+description: "Zero SPOF shortener - Create a short URL that point to a long text."
 publish_to: 'none'
 version: 0.1.0+1
 
